@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Validation</title>
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    /* Style for error messages */
+    .error {
+        color: red; /* Set the text color to red */
+        font-size: 0.9em; /* Slightly smaller font size */
+    }
+</style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Registration Form</h3>
+        </div>
+        <div class="card-body" style="background-color: #02123070;"> 
+            <form id="myForm" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" placeholder="Enter your name" onblur="validateName()" onfocus="checkPreviousInput()">
+                    <span id="nameError" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" onblur="validateEmail()" onfocus="checkPreviousInput('name')">
+                    <span id="emailError" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" class="form-control" id="phoneNumber" placeholder="Enter your phone number" onblur="validatePhoneNumber()" onfocus="checkPreviousInput('email')">
+                    <span id="phoneNumberError" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" onblur="validatePassword()" onfocus="checkPreviousInput('phoneNumber')">
+                    <span id="passwordError" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password:</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" onblur="validateConfirmPassword()" onfocus="checkPreviousInput('password')">
+                    <span id="confirmPasswordError" class="error"></span>
+                </div>
+
+                <div class="form-group form-check">
+                    <input type="checkbox" class="form-check-input" id="checkbox" onchange="toggleSubmit()" onfocus="checkPreviousInput('confirmPassword')">
+                    <label class="form-check-label" for="checkbox">Agree to terms</label>
+                    <span id="checkboxError" class="error"></span>
+                </div>
+
+                <label for="course" style="color: rgba(14, 14, 14, 0.961);">Course:</label>
+                <select id="course" name="course" class="form-control" onchange="updateBranches(); toggleSubmit()" onfocus="checkPreviousInput('checkbox')">
+                    <option value="BE">BE</option>
+                    <option value="Btech">Btech</option>
+                </select>
+                <span id="courseError" the="error"></span><br>
+                
+                <label for="branch" style="color: rgb(12, 12, 12);">Branch:</label>
+                <select id="branch" name="branch" class="form-control" onchange="toggleSubmit()" onfocus="checkPreviousInput('course')">
+                    <option value="">Select</option>
+                    <!-- Options will be dynamically updated based on the selected course -->
+                </select>
+                <span id="branchError" class="error"></span><br>
+                
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="male" value="male" onchange="toggleSubmit()" onfocus="checkPreviousInput('branch')">
+                        <label class="form-check-label" for="male">Male</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="female" value="female" onchange="toggleSubmit()" onfocus="checkPreviousInput('branch')">
+                        <label class="form-check-label" for="female">Female</label>
+                    </div>
+                    <span id="genderError" class="error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <select class="form-control" id="country" style="background-color: #ffffff;" onchange="toggleSubmit()" onfocus="checkPreviousInput('gender')">
+                        <option value="">Select</option>
+                        <option value="usa">USA</option>
+                        <option value="uk">UK</option>
+                        <option value="canada">Canada</option>
+                    </select>
+                    <span id="countryError" class="error"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitButton" disabled>Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Entered Information:</h4>
+        <div style="float:left;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Password</th> <!-- Consider removing or masking this -->
+                        <th>Gender</th>
+                        <th>Country</th>
+                        <th>Course - Branch</th>
+                    </tr>
+                </thead>
+                <tbody id="userData">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and jQuery (for Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- JavaScript for validation -->
+<script>
+function toggleSubmit() {
+    var submitButton = document.getElementById('submitButton');
+    var agreeCheckbox = document.getElementById('checkbox');
+
+    // Enable submit button if the agreeCheckbox is checked
+    if (agreeCheckbox.checked) {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+}
+
+function updateBranches() {
+    var course = document.getElementById('course').value;
+    var branchSelect = document.getElementById('branch');
+
+    branchSelect.innerHTML = ''; // Clear existing options
+
+    if (course === 'BE') {
+        var branches = ['Civil', 'Computer Science', 'Electrical', 'Mechanical'];
+    } else if (course === 'Btech') {
+        var branches = ['Information Technology', 'Electronics & Communication'];
+    }
+
+    branches.forEach(function(branch) {
+        var option = document.createElement('option');
+        option.value = branch;
+        option.textContent = branch;
+        branchSelect.appendChild(option);
+    });
+}
+
+function checkPreviousInput(previousId) {
+    if (previousId) {
+        var previousInput = document.getElementById(previousId);
+        if (previousInput.value === '') {
+            previousInput.focus();
+        }
+    }
+}
+
+function validateName() {
+    var name = document.getElementById('name').value;
+    var errorDiv = document.getElementById('nameError');
+    if (name === '') {
+        errorDiv.textContent = "Name is required!";
+        return false;
+    } else {
+        errorDiv.textContent = "";
+        return true;
+    }
+}
+
+function validateEmail() {
+    var email = document.getElementById('email').value;
+    var errorDiv = document.getElementById('emailError');
+    var emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+    if (!email.match(emailPattern)) {
+        errorDiv.textContent = "Invalid email format!";
+        return false;
+    } else {
+        errorDiv.textContent = "";
+        return true;
+    }
+}
+
+function validatePhoneNumber() {
+    var phoneNumber = document.getElementById('phoneNumber').value;
+    var errorDiv = document.getElementById('phoneNumberError');
+    var phonePattern = /^[0-9]{10}$/;
+    if (!phoneNumber.match(phonePattern)) {
+        errorDiv.textContent = "Phone number must be 10 digits!";
+        return false;
+    } else {
+        errorDiv.textContent = "";
+        return true;
+    }
+}
+
+function validatePassword() {
+    var password = document.getElementById('password').value;
+    var errorDiv = document.getElementById('passwordError');
+    if (password.length < 8) {
+        errorDiv.textContent = "Password must be at least 8 characters long!";
+        return false;
+    } else {
+        errorDiv.textContent = "";
+        return true;
+    }
+}
+
+function validateConfirmPassword() {
+    var password = document.getElementById('password').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
+    var errorDiv = document.getElementById('confirmPasswordError');
+    if (confirmPassword !== password) {
+        errorDiv.textContent = "Passwords do not match!";
+        return false;
+    } else {
+        errorDiv.textContent = "";
+        return true;
+    }
+}
+
+function validateForm() {
+    // Check all validation functions and only submit form if all return true
+    if (!validateName() || !validateEmail() || !validatePhoneNumber() || !validatePassword() || !validateConfirmPassword()) {
+        return false;
+    }
+    // Optionally, display submitted data or send it somewhere
+    // Add user data to table for display
+    var name = document.getElementById('name').value;
+    var email = document.getElementById('email').value;
+    var phoneNumber = document.getElementById('phoneNumber').value;
+    var password = document.getElementById('password').value; // Consider not displaying this for security reasons
+    var gender = document.querySelector('input[name="gender"]:checked').value;
+    var country = document.getElementById('country').value;
+    var course = document.getElementById('course').value;
+    var branch = document.getElementById('branch').value;
+
+    var newRow = document.createElement('tr');
+    newRow.innerHTML = `<td>${name}</td><td>${email}</td><td>${phoneNumber}</td><td>${password}</td><td>${gender}</td><td>${country}</td><td>${course} - ${branch}</td>`;
+    document.getElementById('userData').appendChild(newRow);
+
+    return true; // Return true to allow form submission
+}
+</script>
+</body>
+</html>
